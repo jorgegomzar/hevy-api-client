@@ -1,0 +1,25 @@
+[project]
+name = "hevy-api-client"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic-settings>=2.6.1",
+    "pydantic>=2.9.2",
+    "reflex>=0.6.4",
+    "requests>=2.32.3",
+]
+
+[dependency-groups]
+dev = [
+    "ipdb>=0.13.13",
+    "pyright>=1.1.388",
+    "pytest-mock>=3.14.0",
+    "pytest>=8.3.3",
+    "ruff-lsp>=0.0.58",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
