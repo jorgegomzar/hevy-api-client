@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import json
 import os
 from typing import Any, Iterator, Optional, Type, TypeVar, Union
+from pydantic import ValidationError
 import requests
 
 from hevy_api_client.models import (
@@ -96,40 +97,18 @@ class APIHandler:
         }
         return self.response_model.model_validate(self._request(**req_params)).get_fields()[0]
 
-    def _find_newly_created_doc(self, res: dict[str, Any], doc: T) -> T:
-        """
-        There is an error in the API for some docs on create operations where the API
-        does not return the newly created doc.
-
-        This method is thought to be a temporary patch to find the newly created doc,
-        and is not bulletproof. If 2 exercises share the same properties this function will
-        raise an Exception signaling that we were not able to find the newly created doc.
-        """
-
-        if res:
-            return self.model.model_validate(res)
-
-        new_doc_dict = doc.model_dump(exclude_none=True)
-
-        newly_created_doc_dict: Optional[dict[str, Any]] = next((
-            api_doc
-            for api_doc in self.each()
-            if are_dicts_equal(new_doc_dict, api_doc.model_dump(exclude_none=True))
-        ), None)
-
-        if newly_created_doc_dict is None:
-            raise HevyAPIException(f"Cannot find newly created {self.model.__name__}: {new_doc_dict}")
-
-        return self.model.model_validate(newly_created_doc_dict)
-
     def create(self, doc: T) -> T:
         req_params = {
             "method": "POST",
             "data": {self.document_create_field: doc.model_dump(exclude_none=True)},
         }
 
-        res = self._request(**req_params)[self.document_create_field]
-        return self._find_newly_created_doc(res, doc)
+        res = self._request(**req_params)
+
+        try:
+            return self.model.model_validate(res[self.document_create_field])
+        except ValidationError as e:
+            raise HevyAPIException(f"Could not validate response for {self.model.__name__} creation.\nValidationError: {e}\nResponse: {res}")
 
     def delete(self, doc_id: str):
         raise NotImplementedError("This endpoint is not exposed in the public API yet")
@@ -188,3 +167,17 @@ class HevyAPIClient:
         response_model=RoutineGetResponse,
         model=Routine,
     )
+
+
+if __name__ == "__main__":
+    from dotenv import load_dotenv
+    load_dotenv()
+
+    client = HevyAPIClient()
+    routine_folder = client.routine_folders.create(RoutineFolder(title="Testing Hevy API"))
+
+    assert routine_folder.id is not None
+    print(f"{routine_folder=}")
+
+    routine = client.routines.create(Routine(title="Testing Hevy API routine", folder_id=routine_folder.id))
+    print(f"{routine=}")
