@@ -1,6 +1,7 @@
 import os
 from typing import Any
 
+import typer
 from rich import print
 from rich.console import Console
 from rich.table import Table
@@ -8,14 +9,10 @@ from rich.table import Table
 from hevy_api_client.client import AuthenticatedClient
 
 
-class HevyAPIError(ValueError): ...
-
-
 def get_client() -> AuthenticatedClient:
-    token = os.getenv("HEVY_API_TOKEN")
-
-    if not token:
-        raise HevyAPIError("Token cannot be missing")
+    if not (token := os.getenv("HEVY_API_TOKEN")):
+        print("Token cannot be missing")
+        raise typer.Exit(-1)
 
     return AuthenticatedClient(token)
 

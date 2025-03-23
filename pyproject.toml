@@ -1,6 +1,6 @@
 [project]
 name = "hevy-api-client"
-version = "0.1.0"
+version = "0.1.1"
 description = "A client library to interact with Hevy API + a CLI tool"
 readme = "README.md"
 authors = [
