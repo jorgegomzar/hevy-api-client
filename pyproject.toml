@@ -7,7 +7,10 @@ authors = [
     { name = "Jorge Gómez Zarzosa", email = "jorge.gomez@gmail.com" }
 ]
 requires-python = ">=3.9"
-include = ["CHANGELOG.md", "src/hevy_api_client/py.typed"]
+include = [
+  "src/hevy_api_client/py.typed",
+  "src/hevy_cli/py.typed",
+]
 
 dependencies = [
     "httpx>=0.20.0,<0.29.0",
