@@ -4,6 +4,7 @@ import typer
 from rich import print
 
 from hevy_api_client.api.routines import get_v1_routines, post_v1_routines
+from hevy_api_client.cli.utils import get_client, print_table
 from hevy_api_client.models import (
     GetV1RoutinesResponse200,
     PostRoutinesRequestBody,
@@ -14,7 +15,6 @@ from hevy_api_client.models import (
     Routine,
 )
 from hevy_api_client.types import Unset
-from hevy_cli.utils import get_client, print_table
 
 app = typer.Typer(no_args_is_help=True)
 client = get_client()
@@ -60,20 +60,19 @@ def list_all(
             routines.append(r_dict)
 
     if not routines:
-        print("No routines found.")
+        print("No routines found")
         raise typer.Exit()
 
-    print_table(sorted(
-        routines,
-        key=lambda x: (
-            str(x.get("folder_id") or ""),
-            x.get("title") or ""
+    print_table(
+        sorted(
+            routines,
+            key=lambda x: (str(x.get("folder_id") or ""), x.get("title") or ""),
         )
-    ))
+    )
 
 
 # @app.command()
-# TODO: implement
+# TODO: implement
 def create(title: str, folder_id: int):
     """Create a new routine"""
 
@@ -99,7 +98,7 @@ def create(title: str, folder_id: int):
     if not res or not isinstance(res, Routine):
         print("ERROR")
         if isinstance(res, (PostV1RoutinesResponse400, PostV1RoutinesResponse403)):
-            print(res.error)
+            print({res.error})
         raise typer.Exit(-1)
 
     list_all(folder_id)

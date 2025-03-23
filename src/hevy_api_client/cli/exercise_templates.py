@@ -5,9 +5,9 @@ import typer
 from rich import print
 
 from hevy_api_client.api.exercise_templates import get_v1_exercise_templates
+from hevy_api_client.cli.utils import get_client, print_table
 from hevy_api_client.models import GetV1ExerciseTemplatesResponse200
 from hevy_api_client.types import Unset
-from hevy_cli.utils import get_client, print_table
 
 app = typer.Typer(no_args_is_help=True)
 client = get_client()
@@ -94,21 +94,18 @@ def list_all(
             continue
 
         for exercise in res.exercise_templates:
-            if (
-                muscle_group is not None and
-                (
-                    exercise.primary_muscle_group != muscle_group or
-                    (
-                        exercise.secondary_muscle_groups and
-                        muscle_group not in exercise.secondary_muscle_groups
-                    )
+            if muscle_group is not None and (
+                exercise.primary_muscle_group != muscle_group
+                or (
+                    exercise.secondary_muscle_groups
+                    and muscle_group not in exercise.secondary_muscle_groups
                 )
             ):
                 continue
 
             if (
-                equipment is not None and
-                exercise.additional_properties.get("equipment") != equipment
+                equipment is not None
+                and exercise.additional_properties.get("equipment") != equipment
             ):
                 continue
 
@@ -116,7 +113,7 @@ def list_all(
             exercises.append(e_dict)
 
     if not exercises:
-        print("No routines found.")
+        print("No exercises found")
         raise typer.Exit()
 
     print_table(

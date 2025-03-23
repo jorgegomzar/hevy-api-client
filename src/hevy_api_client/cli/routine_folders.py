@@ -6,6 +6,7 @@ from hevy_api_client.api.routine_folders import (
     get_v1_routine_folders,
     post_v1_routine_folders,
 )
+from hevy_api_client.cli.utils import get_client, print_table
 from hevy_api_client.models import (
     PostRoutineFolderRequestBody,
     PostRoutineFolderRequestBodyRoutineFolder,
@@ -13,7 +14,6 @@ from hevy_api_client.models import (
     RoutineFolder,
 )
 from hevy_api_client.types import Unset
-from hevy_cli.utils import get_client, print_table
 
 app = typer.Typer(no_args_is_help=True)
 client = get_client()
@@ -29,16 +29,17 @@ def list_all() -> None:
     page = 1
 
     while has_more:
-        if not (res := get_v1_routine_folders.sync(
-            client=client,
-            api_key=client.token,  # type: ignore
-            page=page,
-        )):
+        if not (
+            res := get_v1_routine_folders.sync(
+                client=client,
+                api_key=client.token,  # type: ignore
+                page=page,
+            )
+        ):
             break
 
         has_more = (
-            not isinstance(res.routine_folders, Unset)
-            and len(res.routine_folders) != 0
+            not isinstance(res.routine_folders, Unset) and len(res.routine_folders) != 0
         )
         page += 1
 

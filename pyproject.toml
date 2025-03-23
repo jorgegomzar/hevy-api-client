@@ -1,6 +1,6 @@
 [project]
 name = "hevy-api-client"
-version = "0.0.1"
+version = "0.1.0"
 description = "A client library to interact with Hevy API + a CLI tool"
 readme = "README.md"
 authors = [
@@ -33,7 +33,7 @@ dev = [
 ]
 
 [project.scripts]
-hevy = "hevy_cli:cli_entrypoint"
+hevy = "hevy_api_client.cli:cli_entrypoint"
 
 [build-system]
 requires = ["hatchling"]
